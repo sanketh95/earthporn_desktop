@@ -33,17 +33,15 @@ namespace EpApp
 
         private static IWallpaperSetter CreateWallpaperSetter()
         {
-            bool isWindows = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
-            if (isWindows)
-            {
+            //If Windows
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 return new WindowsWallpaperImageSetter();
-            }
-            bool isOSX = System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-            if (isOSX)
-            {
+            
+            //If OSX
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
                 return new MacOSWallpaperImageSetter();
-            }
-            throw new Exception("Cannot set wallpaper for this OS.");
+
+            throw new NotImplementedException("Cannot set wallpaper for this OS.");
         }
     }
 }
