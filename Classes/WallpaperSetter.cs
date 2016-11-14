@@ -1,3 +1,4 @@
+using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -33,6 +34,16 @@ namespace EpApp.Classes
             ExternalProcess.StartInfo.CreateNoWindow = true;
             ExternalProcess.Start();
             ExternalProcess.WaitForExit();
+        }
+    }
+
+    public class LinuxWallpaperImageSetter : IWallpaperSetter
+    {
+        public void SetWallpaper(string fileName) 
+        {
+            //TODO
+
+            throw new NotImplementedException();
         }
     }
 }
