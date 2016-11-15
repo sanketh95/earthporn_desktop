@@ -11,30 +11,44 @@ namespace EpApp
             Console.WriteLine("App Started");
             Console.WriteLine("Talking to Reddit...");
 
+            uint imagesLimit = 10; // can be read from args
+
             Reddit reddit = new Reddit();
-            RedditReponse response = reddit.GetPostsAsync().Result;
+            RedditReponse response = reddit.GetPostsAsync(imagesLimit).Result;
 
-            string topImage = response.data.children[0].data.url;
+            var liked = false;
+            var imgIndex = 0;
 
-            Console.WriteLine("Reddit data retrieved: " + topImage);
-            Console.WriteLine("Downloading file...");
-
-            IFileSaver saver = new FileDownloader();
-            string path = saver.Save(topImage);
-
-            Console.WriteLine("File downloaded to: " + path);
-            Console.WriteLine("Setting desktop wallpaper...");
-
-            IWallpaperSetter setter = CreateWallpaperSetter();
-            if(setter == null)
+            do
             {
-                Console.Error.WriteLine("Platform not detected.");
-                return;
-            }
+                string topImage = response.data.children[imgIndex].data.url;
 
-            setter.SetWallpaper(path);
+                Console.WriteLine("Reddit data retrieved: " + topImage);
+                Console.WriteLine("Downloading file...");
 
-            Console.WriteLine("Done!");
+                IFileSaver saver = new FileDownloader();
+                string path = saver.Save(topImage);
+
+                Console.WriteLine("File downloaded to: " + path);
+                Console.WriteLine("Setting desktop wallpaper...");
+
+                IWallpaperSetter setter = CreateWallpaperSetter();
+                if (setter == null)
+                {
+                    Console.Error.WriteLine("Platform not detected.");
+                    return;
+                }
+
+                setter.SetWallpaper(path);
+
+                Console.WriteLine("Done!");
+                Console.WriteLine("Do you like it? [y (or empty line)/ n (or something else)]...");
+
+                var input = Console.ReadLine().Trim();
+                liked = string.IsNullOrEmpty(input) ? true : "y".Equals(input, StringComparison.OrdinalIgnoreCase) ? true : false;
+                imgIndex++;
+
+            } while (!liked && imgIndex < imagesLimit);
         }
 
         private static IWallpaperSetter CreateWallpaperSetter()

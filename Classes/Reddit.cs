@@ -8,11 +8,11 @@ namespace EpApp.Classes
 {
     public class Reddit 
     {
-        private const string URL = "https://www.reddit.com/r/EarthPorn.json?limit=1";
+        private const string URL = "https://www.reddit.com/r/EarthPorn.json?limit=";
 
-        public async Task<RedditReponse> GetPostsAsync()
+        public async Task<RedditReponse> GetPostsAsync(uint imagesLimit = 1)
         {
-            HttpWebRequest req = HttpWebRequest.CreateHttp(URL);
+            HttpWebRequest req = HttpWebRequest.CreateHttp(URL + imagesLimit);
             req.Headers["User-Agent"] = "dotnetcore:earthporn.desktop:v0.9 (by /u/BlahYourHamster)";
             HttpWebResponse res = (HttpWebResponse)await req.GetResponseAsync();
             
