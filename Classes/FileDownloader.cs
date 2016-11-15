@@ -23,11 +23,13 @@ namespace EpApp.Classes
 
             //Create a temporary file.
             string temp = Path.GetTempFileName();
-            temp = Path.ChangeExtension(temp, extension);
+            string withExtension = Path.ChangeExtension(temp, extension);
 
             DownloadFileAsync(source, temp).Wait();
 
-            return temp;
+            File.Move(temp, withExtension);
+
+            return withExtension;
         }
         
         private string SanitizeSource(string source, string extension) 
@@ -59,7 +61,7 @@ namespace EpApp.Classes
                 {
                     using (Stream contentStream = await 
                         (await httpClient.SendAsync(request)).Content.ReadAsStreamAsync(),
-                                stream = new FileStream(destination, FileMode.Create, FileAccess.Write))
+                                stream = new FileStream(destination, FileMode.Open, FileAccess.Write))
                     {
                         await contentStream.CopyToAsync(stream);
                     }

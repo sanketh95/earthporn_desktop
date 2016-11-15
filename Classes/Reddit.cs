@@ -13,6 +13,7 @@ namespace EpApp.Classes
         public async Task<RedditReponse> GetPostsAsync()
         {
             HttpWebRequest req = HttpWebRequest.CreateHttp(URL);
+            req.Headers["User-Agent"] = "dotnetcore:earthporn.desktop:v0.9 (by /u/BlahYourHamster)";
             HttpWebResponse res = (HttpWebResponse)await req.GetResponseAsync();
             StreamReader stream = new StreamReader(res.GetResponseStream());
             
