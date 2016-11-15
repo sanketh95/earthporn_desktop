@@ -26,6 +26,12 @@ namespace EpApp
             Console.WriteLine("Setting desktop wallpaper...");
 
             IWallpaperSetter setter = CreateWallpaperSetter();
+            if(setter == null)
+            {
+                Console.Error.WriteLine("Platform not detected.");
+                return;
+            }
+
             setter.SetWallpaper(path);
 
             Console.WriteLine("Done!");
@@ -45,7 +51,18 @@ namespace EpApp
 
             //If Linux
             if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                setter = new LinuxWallpaperImageSetter();
+            {
+                var desktopEnvironment = Environment.GetEnvironmentVariable("DESKTOP_SESSION") ??
+                                         Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP") ??
+                                         Environment.GetEnvironmentVariable("XDG_SESSION_DESKTOP");
+                switch(desktopEnvironment.ToLower())
+                {
+                    case "gnome":
+                        setter = new LinuxGnomeWallpaperImageSetter();
+                        break;
+                }
+                
+            }
 
             return setter;
         }

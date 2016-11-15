@@ -1,4 +1,5 @@
 using System;
+using System.Text;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
@@ -37,13 +38,22 @@ namespace EpApp.Classes
         }
     }
 
-    public class LinuxWallpaperImageSetter : IWallpaperSetter
+    public class LinuxGnomeWallpaperImageSetter : IWallpaperSetter
     {
+        [DllImport("libgio-2.0.so")]
+        private static extern IntPtr g_settings_new(string path);
+
+        [DllImport("libgio-2.0.so")]
+        private static extern string g_settings_get_string(IntPtr settings, string key);
+
+        [DllImport("libgio-2.0.so")]
+        private static extern bool g_settings_set_string(IntPtr settings, string key, StringBuilder value);
+
         public void SetWallpaper(string fileName) 
         {
-            //TODO
-
-            throw new NotImplementedException();
+            var settings = g_settings_new("org.gnome.desktop.background");
+            g_settings_set_string(settings, "picture-uri",
+                new StringBuilder("file://" + fileName));
         }
     }
 }
