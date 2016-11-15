@@ -15,9 +15,11 @@ namespace EpApp.Classes
             HttpWebRequest req = HttpWebRequest.CreateHttp(URL);
             req.Headers["User-Agent"] = "dotnetcore:earthporn.desktop:v0.9 (by /u/BlahYourHamster)";
             HttpWebResponse res = (HttpWebResponse)await req.GetResponseAsync();
-            StreamReader stream = new StreamReader(res.GetResponseStream());
             
-            string result = stream.ReadToEnd();
+            string result;
+
+            using (StreamReader stream = new StreamReader(res.GetResponseStream()))
+                result = stream.ReadToEnd();
             
             return JsonConvert.DeserializeObject<RedditReponse>(result);
         }
