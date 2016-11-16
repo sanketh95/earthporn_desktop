@@ -1,5 +1,5 @@
 # Earth Porn Desktop Wallpaper App
-Sets the top image on [Earth Porn](http://www.reddit.com/r/earthporn) as your desktop wallpaper.
+A multi-platform app which sets the top image on [/r/earthporn](http://www.reddit.com/r/earthporn) as your desktop wallpaper. Available on **Windows**, **MacOS** and **Linux**.
 
 ## Installation
 
@@ -32,7 +32,34 @@ Setting desktop wallpaper...
 Done!
 ```
 
-Feel free to **deploy** the app on your machine, you can follow [this guide](https://docs.microsoft.com/en-us/dotnet/articles/core/deploying/).
+## Deployment
+To deploy the app to an executable, you can follow [this guide](https://docs.microsoft.com/en-us/dotnet/articles/core/deploying/).
+
+### Deployment Example
+This is a brief example of how to deploy the app to an executable on **Windows**.
+
+Modify the `project.json` file and remove the following line:
+
+```
+"type": "platform",
+```
+
+Now, add a `runtimes` property on the root JSON object with the Windows 10 platform:
+
+```
+"runtimes": {
+    "win10-x64": {}
+}
+```
+
+Execute the following commands in the command line to build and publish the app:
+
+```
+dotnet build -r win10-x64
+dotnet publish -c release -r win10-x64
+```
+
+A **.exe** file, along with all of the required references will be have been created in the directory: `\bin\release\netcoreapp1.0\win10-x64`
 
 ## Contributing
 All constributions are welcome. Please fork, make your changes and submit a pull request. 
