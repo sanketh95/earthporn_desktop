@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -8,20 +9,43 @@ namespace EpApp.Classes
 {
     public class Reddit 
     {
-        private const string URL = "https://www.reddit.com/r/EarthPorn.json?limit=";
+        private const string URL = "https://www.reddit.com/r/EarthPorn.json?limit={0}";
+        private const string URL_AFTER = "https://www.reddit.com/r/EarthPorn.json?limit={0}&after={1}_{2}";
 
-        public async Task<RedditReponse> GetPostsAsync(uint imagesLimit = 1)
+        public async Task<RedditReponse> GetPostsAsync(uint limit = 1)
         {
-            HttpWebRequest req = HttpWebRequest.CreateHttp(URL + imagesLimit);
-            req.Headers["User-Agent"] = "dotnetcore:earthporn.desktop:v0.9 (by /u/BlahYourHamster)";
-            HttpWebResponse res = (HttpWebResponse)await req.GetResponseAsync();
+            string url = string.Format(URL, limit);
             
+            return await GetResponseObjectAsync<RedditReponse>(url);
+        }
+
+        public async Task<RedditReponse> GetPostsAfterAsync(Child after, uint limit = 1)
+        {
+            if (after == null)
+                throw new ArgumentNullException(nameof(after));
+                
+            string url = string.Format(URL_AFTER, limit, after.kind, after.data.id);
+            
+            return await GetResponseObjectAsync<RedditReponse>(url);
+        }
+
+        private async Task<T> GetResponseObjectAsync<T>(string url)
+        {
+            HttpWebResponse res = await GetResponseAsync(url);
+
             string result;
 
             using (StreamReader stream = new StreamReader(res.GetResponseStream()))
                 result = stream.ReadToEnd();
             
-            return JsonConvert.DeserializeObject<RedditReponse>(result);
+            return JsonConvert.DeserializeObject<T>(result);
+        }
+
+        private async Task<HttpWebResponse> GetResponseAsync(string url)
+        {
+            HttpWebRequest req = HttpWebRequest.CreateHttp(url);
+            req.Headers["User-Agent"] = "dotnetcore:earthporn.desktop:v0.9 (by /u/BlahYourHamster)";
+            return (HttpWebResponse)await req.GetResponseAsync();
         }
     }
 

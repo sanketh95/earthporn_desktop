@@ -24,12 +24,12 @@ The output should look something like this:
 
 ```
 App Started
-Talking to Reddit...
-Reddit data retrieved: [URL]
-Downloading file...
-File downloaded to: [Path]
+Getting top image from /r/earthporn...
+Downloading image: [URL]
+Image downloaded to: [Path]
 Setting desktop wallpaper...
-Done!
+Do you like it? [Y/N]
+...
 ```
 
 ## Deployment
@@ -62,4 +62,4 @@ dotnet publish -c release -r win10-x64
 A **.exe** file, along with all of the required references will be have been created in the directory: `\bin\release\netcoreapp1.0\win10-x64`
 
 ## Contributing
-All constributions are welcome. Please fork, make your changes and submit a pull request. 
+All constributions are welcome. Please fork, make your changes and submit a pull request.

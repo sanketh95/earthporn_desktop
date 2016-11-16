@@ -9,46 +9,54 @@ namespace EpApp
         public static void Main(string[] args)
         {
             Console.WriteLine("App Started");
-            Console.WriteLine("Talking to Reddit...");
-
-            uint imagesLimit = 10; // can be read from args
 
             Reddit reddit = new Reddit();
-            RedditReponse response = reddit.GetPostsAsync(imagesLimit).Result;
+            IFileSaver saver = new FileDownloader();
+            IWallpaperSetter setter = CreateWallpaperSetter();
 
-            var liked = false;
-            var imgIndex = 0;
-
-            do
+            if (setter == null)
             {
-                string topImage = response.data.children[imgIndex].data.url;
+                Console.Error.WriteLine("Platform not detected.");
+                return;
+            }
 
-                Console.WriteLine("Reddit data retrieved: " + topImage);
-                Console.WriteLine("Downloading file...");
+            Console.WriteLine("Getting top image from /r/earthporn...");
 
-                IFileSaver saver = new FileDownloader();
-                string path = saver.Save(topImage);
+            //Get the top image to start with.
+            RedditReponse response = reddit.GetPostsAsync(limit: 1).Result;
 
-                Console.WriteLine("File downloaded to: " + path);
+            bool liked = false;
+
+            while(!liked)
+            {
+                Child post = response.data.children[0];
+                
+                Console.WriteLine("Downloading image: " + post.data.url);
+
+                string path = saver.Save(post.data.url);
+
+                Console.WriteLine("Image downloaded to: " + path);
                 Console.WriteLine("Setting desktop wallpaper...");
-
-                IWallpaperSetter setter = CreateWallpaperSetter();
-                if (setter == null)
-                {
-                    Console.Error.WriteLine("Platform not detected.");
-                    return;
-                }
 
                 setter.SetWallpaper(path);
 
-                Console.WriteLine("Done!");
-                Console.WriteLine("Do you like it? [y (or empty line)/ n (or something else)]...");
+                Console.WriteLine("Do you like it? [Y/N]");
 
                 var input = Console.ReadLine().Trim();
-                liked = string.IsNullOrEmpty(input) ? true : "y".Equals(input, StringComparison.OrdinalIgnoreCase) ? true : false;
-                imgIndex++;
+                liked = input.ToLower().Equals("y", StringComparison.OrdinalIgnoreCase);
+                
+                //If they didn't like it, get the next post and try again.
+                if (!liked)
+                {
+                    Console.WriteLine("Getting the next image from /r/earthporn...");
 
-            } while (!liked && imgIndex < imagesLimit);
+                    response = reddit.GetPostsAfterAsync(response.data.children[0], limit: 1).Result;
+
+                    Console.WriteLine("Reddit data retrieved.");
+                }
+            }
+
+            Console.WriteLine("Finished!");
         }
 
         private static IWallpaperSetter CreateWallpaperSetter()
@@ -69,13 +77,13 @@ namespace EpApp
                 var desktopEnvironment = Environment.GetEnvironmentVariable("DESKTOP_SESSION") ??
                                          Environment.GetEnvironmentVariable("XDG_CURRENT_DESKTOP") ??
                                          Environment.GetEnvironmentVariable("XDG_SESSION_DESKTOP");
+
                 switch(desktopEnvironment.ToLower())
                 {
                     case "gnome":
                         setter = new LinuxGnomeWallpaperImageSetter();
                         break;
                 }
-                
             }
 
             return setter;
