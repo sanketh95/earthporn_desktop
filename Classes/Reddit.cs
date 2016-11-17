@@ -9,22 +9,11 @@ namespace EpApp.Classes
 {
     public class Reddit 
     {
-        private const string URL = "https://www.reddit.com/r/EarthPorn.json?limit={0}";
-        private const string URL_AFTER = "https://www.reddit.com/r/EarthPorn.json?limit={0}&after={1}_{2}";
+        private const string URL = "https://www.reddit.com/r/EarthPorn/random.json?limit={0}";
 
         public async Task<RedditReponse> GetPostsAsync(uint limit = 1)
         {
             string url = string.Format(URL, limit);
-            
-            return await GetResponseObjectAsync<RedditReponse>(url);
-        }
-
-        public async Task<RedditReponse> GetPostsAfterAsync(Child after, uint limit = 1)
-        {
-            if (after == null)
-                throw new ArgumentNullException(nameof(after));
-                
-            string url = string.Format(URL_AFTER, limit, after.kind, after.data.id);
             
             return await GetResponseObjectAsync<RedditReponse>(url);
         }
@@ -38,7 +27,7 @@ namespace EpApp.Classes
             using (StreamReader stream = new StreamReader(res.GetResponseStream()))
                 result = stream.ReadToEnd();
             
-            return JsonConvert.DeserializeObject<T>(result);
+            return JsonConvert.DeserializeObject<List<T>>(result)[0];
         }
 
         private async Task<HttpWebResponse> GetResponseAsync(string url)

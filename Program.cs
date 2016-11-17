@@ -50,7 +50,7 @@ namespace EpApp
                 {
                     Console.WriteLine("Getting the next image from /r/earthporn...");
 
-                    response = reddit.GetPostsAfterAsync(response.data.children[0], limit: 1).Result;
+                    response = reddit.GetPostsAsync(limit: 1).Result;
 
                     Console.WriteLine("Reddit data retrieved.");
                 }
